@@ -52,6 +52,42 @@ app.post('/api/notes', function (req, res) {
 
 //add delete for bonus points
 
+app.delete("/api/notes/:id", function (req, res) {
+  try {
+    createNoteData = fs.readFileSync("./db/db.json", "utf8");
+    createNoteData = JSON.parse(createNoteData);
+    createNoteData = createNoteData.filter(function (note) {
+      return note.id != req.params.id;
+    });
+    createNoteData = JSON.stringify(createNoteData);
+
+    fs.writeFile("./db/db.json", createNoteData, "utf8", function (err) {
+      if (err) throw err;
+    });
+
+    res.send(JSON.parse(createNoteData));
+  } catch (err) {
+    throw err;
+    console.log (err);
+  }
+});
 
 
-app.listen(PORT);
+
+
+//html get requests
+app.get("/notes", function (req, res) {
+  res.sendFile(path.join(_dirname, "public/notes.html"));
+});
+
+app.get("*", function (req, res) {
+  res.sendFile(path.join(_dirname, "public/index.html"));
+});
+
+app.get("/api/notes", function (req, res) {
+  return res.sendFile(path.json(_dirname, "db/db.json"));
+});
+
+app.listen(PORT, function() {
+  console.log("server is listening: " + PORT);
+});
